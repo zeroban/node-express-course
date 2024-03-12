@@ -1,8 +1,26 @@
 You continue to work in the `jobs-ejs` repository. Create a branch called `lesson14` for this week’s work.
 
+### Fixing the Security
+
+Passport is using the session cookie to determine if the user is logged in. This creates a security vulnerability called “cross site request forgery” (CSRF). We will demonstrate this.
+
+To see this, clone **[this repository](https://github.com/Code-the-Dream-School/csrf-attack)** into a separate directory, outside of the current `jobs-ejs` folder. Then, within the directory you cloned, install packages with `npm install` and run the app with `node app`. This will start another express application listening on port **4000** of your local machine. This is the attacking code. It could be running anywhere on the Internet — that has nothing to do with the attack.
+
+You should have two browser tabs open, one for localhost:3000, and one for localhost:4000\. The one at localhost:4000 just shows a button that says Click Me! **Don’t click it yet**. Use the `jobs-ejs` application in the 3000 tab to set the secret string to some value. Then close the tab for localhost:3000\. Then open a new tab for localhost:3000\. Then check the value of the secret string. So far so good — it still has the value you set. If you log off, your session is discarded. Try this: Log off. Then click the button in the localhost:4000 tab. Then log back on and view the secret string. It is back to syzygy. Set it to a custom value.
+
+Now, without logging off of jobs-ejs , click the button in the 4000 tab. Then refresh the /secretWord page in `jobs-ejs`. Hey, what happened! (By the way, this attack would succeed even if you closed the 3000 tab entirely.)
+
+You see, the other application sends a request to your application in the context of your browser — and that browser request automatically includes the cookie. So, the application thinks the request comes from a logged on user, and honors it. If the application, as a result of a form post, makes database changes, or even transfers money, the attacker could do that as well.
+
+So, how to fix this? This is the purpose of the host-csrf package you installed at the start of the project. Follow the instructions **[here](https://www.npmjs.com/package/host-csrf#:~:text=The%20csrf%20middleware,Example%3A)** to integrate the package with your application. You will need to change app.js as well as **each of the forms** in your EJS files. You can use `process.env.SESSION_SECRET` as your `cookie-parser` secret. Note that the `app.use` for the CSRF middleware must come _after_ the cookie parser middleware and _after_ the body parser middleware, but _before_ any of the routes. You will see a message logged to the console that the CSRF protection is not secure. That is because you are using HTTP, not HTTPS, so the package is less secure in this case, but you would be using HTTPS in production. As you will see, it stops the attack.
+
+Re-test, first to see that your application still works, and second, to see that the attack no longer works. (A moral: Always log off of sensitive applications before you surf, in case the sensitive application is vulnerable in this way. Also note that it does not help to close the application, as the cookie is still present in the browser. You have to log off to clear the cookie. Even restarting the browser does not suffice.)
+
+Enabling CSRF protection in the project is an _important_ part of this lesson — don’t omit it! By the way, the CSRF attack only works when the credential is in a cookie. It doesn’t work if you use JWTs in the authorization header.  However, as we've seen, to send JWTs in an authorization header, you have to store sensitive data in browser local storage, which is always a bad idea.
+
 ### A Couple of Tips
 
-This lesson shows how to build a dynamic database application with **no client-side JavaScript.** Of course, in real-world applications, you’ll often have client side JavaScript, but this lesson shows that you can do a lot of things without it.
+The rest of this lesson shows how to build a dynamic database application with **no client-side JavaScript.** Of course, in real-world applications, you’ll often have client side JavaScript, but this lesson shows that you can do a lot of things without it.
 
 However, it does necessitate some differences in approach. If all you have on the client side is HTML, the client can only send `GET` requests (for links) or `POST` requests (for submitting a form). You can’t send `PUT`, `PATCH`, or `DELETE` operations from HTML — unless you add in some client-side JavaScript. So, in this lesson, all routes are GET and POST routes.
 
@@ -104,4 +122,4 @@ You need to include the auth middleware in the `app.use`, because these are prot
 
 ### Submitting Your Work
 
-The usual steps apply. This lesson is intended to be short and simple, as you need to progress on your final projects.
+The usual steps apply.
