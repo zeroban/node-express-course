@@ -462,24 +462,6 @@ app.use("/secretWord", auth, secretWordRouter);
 
 That causes the authentication middleware to run before the `secretWordRouter`, and it redirects if any requests are made for those routes before logon. Try it out: login and verify that you can see and change the secretWord. Then log off and try to go to the `"/secretWord"` URL.
 
-### Fixing the Security
-
-Passport is using the session cookie to determine if the user is logged in. This creates a security vulnerability called “cross site request forgery” (CSRF). We will demonstrate this.
-
-To see this, clone **[this repository](https://github.com/Code-the-Dream-School/csrf-attack)** into a separate directory, outside of the current `jobs-ejs` folder. Then, within the directory you cloned, install packages with `npm install` and run the app with `node app`. This will start another express application listening on port **4000** of your local machine. This is the attacking code. It could be running anywhere on the Internet — that has nothing to do with the attack.
-
-You should have two browser tabs open, one for localhost:3000, and one for localhost:4000\. The one at localhost:4000 just shows a button that says Click Me! **Don’t click it yet**. Use the `jobs-ejs` application in the 3000 tab to set the secret string to some value. Then close the tab for localhost:3000\. Then open a new tab for localhost:3000\. Then check the value of the secret string. So far so good — it still has the value you set. If you log off, your session is discarded. Try this: Log off. Then click the button in the localhost:4000 tab. Then log back on and view the secret string. It is back to syzygy. Set it to a custom value.
-
-Now, without logging off of jobs-ejs , click the button in the 4000 tab. Then refresh the /secretWord page in `jobs-ejs`. Hey, what happened! (By the way, this attack would succeed even if you closed the 3000 tab entirely.)
-
-You see, the other application sends a request to your application in the context of your browser — and that browser request automatically includes the cookie. So, the application thinks the request comes from a logged on user, and honors it. If the application, as a result of a form post, makes database changes, or even transfers money, the attacker could do that as well.
-
-So, how to fix this? This is the purpose of the host-csrf package you installed at the start of the project. Follow the instructions **[here](https://www.npmjs.com/package/host-csrf#:~:text=The%20csrf%20middleware,Example%3A)** to integrate the package with your application. You will need to change app.js as well as **each of the forms** in your EJS files. You can use `process.env.SESSION_SECRET` as your `cookie-parser` secret. Note that the `app.use` for the CSRF middleware must come _after_ the cookie parser middleware and _after_ the body parser middleware, but _before_ any of the routes. You will see a message logged to the console that the CSRF protection is not secure. That is because you are using HTTP, not HTTPS, so the package is less secure in this case, but you would be using HTTPS in production. As you will see, it stops the attack.
-
-Re-test, first to see that your application still works, and second, to see that the attack no longer works. (A moral: Always log off of sensitive applications before you surf, in case the sensitive application is vulnerable in this way. Also note that it does not help to close the application, as the cookie is still present in the browser. You have to log off to clear the cookie. Even restarting the browser does not suffice.)
-
-Enabling CSRF protection in the project is an _important_ part of this lesson — don’t omit it! By the way, the CSRF attack only works when the credential is in a cookie. It doesn’t work if you use JWTs in the authorization header. There are advantages and disadvantages to both forms of sending protected data between a client and a server — but it is always a bad idea to store sensitive data in browser local storage.
-
 ### Submitting Your Work
 
 As usual, add and commit your changes and push the `lesson13` branch to your Github. Then create the pull request and include the link in your homework submission.
