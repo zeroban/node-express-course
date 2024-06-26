@@ -21,17 +21,67 @@ const getBody = (req, callback) => {
 };
 
 // here, you could declare one or more variables to store what comes back from the form.
-let item = "Enter something below.";
+let item = " ";
+let fav_Colors = " ";
+let back_color = " ";
 
 // here, you can change the form below to modify the input fields and what is displayed.
 // This is just ordinary html with string interpolation.
 const form = () => {
   return `
   <body>
-  <p>${item}</p>
-  <form method="POST">
-  <input name="item"></input>
-  <button type="submit">Submit</button>
+  <STYLE>
+  body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-weight: bold;
+            background-color: ${back_color};
+        }
+
+        .form-container { 
+        border: 2px solid rgba(255, 255, 255, .2);
+        padding: 20px;
+        border-radius: 30px;
+        background: gray;
+        backdrop-filter: blur(20px);
+
+        }
+         
+            </STYLE>
+
+
+
+  <div class="form-container">
+        <form method="POST">
+            <label for="item">Pick your favorite shape:</label>
+            <select id="item" name="item">
+                <option value=""></option>
+                <option value="Circle">circle</option>
+                <option value="Square">square</option>
+                <option value="Triangle">triangle</option>
+                <option value="Rectangle">rectangle</option>
+            </select>
+              <p>${item}</p>
+
+            <br>
+            <br>
+            <label for="fav_Color">Pick your favorite color:</label>
+            <select id="fav_Colors" name="fav_Colors">
+                <option value=""></option>
+                <option value="Red">red</option>
+                <option value="Blue">blue</option>
+                <option value="Green">green</option>
+                <option value="Yellow">yellow</option>
+            </select>
+              <p>${fav_Colors}</p>
+
+            <br>
+            <br>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
   </form>
   </body>
   `;
@@ -44,18 +94,35 @@ const server = http.createServer((req, res) => {
     getBody(req, (body) => {
       console.log("The body of the post is ", body);
       // here, you can add your own logic
+
       if (body["item"]) {
         item = body["item"];
-      } else {
+      }
+
+      else {
         item = "Nothing was entered.";
       }
+
+
       // Your code changes would end here
+      if (body["fav_Colors"]) {
+        fav_Colors = body["fav_Colors"];
+        back_color = body["fav_Colors"];
+      }
+
+      else {
+        fav_Colors = "You did not pick a color.";
+        back_color = "white";
+      }
+
       res.writeHead(303, {
         Location: "/",
       });
       res.end();
     });
-  } else {
+  }
+
+  else {
     res.end(form());
   }
 });
