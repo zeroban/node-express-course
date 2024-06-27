@@ -1,3 +1,4 @@
+const { log } = require("console");
 const http = require("http");
 var StringDecoder = require("string_decoder").StringDecoder;
 
@@ -127,5 +128,11 @@ const server = http.createServer((req, res) => {
   }
 });
 
+server.on("request", (req) => {
+  console.log("event received: ", req.method, req.url);
+});
+
 server.listen(3000);
 console.log("The server is listening on port 3000.");
+// new comment for week 2 assignment.
+console.log("Server is now up and running");
