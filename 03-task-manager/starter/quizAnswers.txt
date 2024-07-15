@@ -7,6 +7,7 @@
     R = Read
     U = Update
     D = Destroy
+    
 
 3. You are careful to store your sensitive information in a .env file.
     A. How do you get your app to access the information in the .env file?
