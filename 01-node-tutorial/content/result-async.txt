@@ -1,1 +1,3 @@
-Here is the result : Hello this is first text file, Hello this is second text file
+This is the first line.
+This is second line.
+This is the third line.
