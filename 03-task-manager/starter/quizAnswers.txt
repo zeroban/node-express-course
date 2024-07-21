@@ -1,0 +1,19 @@
+1. Quickly explain how middleware is used in an Express application.
+
+
+
+2. What does CRUD stand for?
+    C = Create
+    R = Read
+    U = Update
+    D = Destroy
+    
+
+3. You are careful to store your sensitive information in a .env file.
+    A. How do you get your app to access the information in the .env file?
+        1. You would want to require('dotenv).config in your main app.js file and then that will allow you to call in your variable from your .env file.  
+
+    b. How do you protect the contents of the .env file so that it is not stored in your Github repository?
+        1. You want to add the .env file to .gitignore so that when you push it up to GitHub it does not push that stored password up to GitHub.  
+
+
